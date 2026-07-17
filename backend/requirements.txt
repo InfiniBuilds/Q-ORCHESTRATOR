@@ -1,0 +1,4 @@
+cryptography==49.0.0
+fastapi==0.139.2
+oqs==0.10.2
+pydantic==2.13.4
