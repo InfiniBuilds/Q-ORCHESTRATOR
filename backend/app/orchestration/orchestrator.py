@@ -80,3 +80,20 @@ class QOrchestrator:
             selection=selection,
             crypto_result=crypto_result,
         )
+
+    def prescribe(
+        self,
+        context: UnifiedContext,
+    ) -> OrchestrationResult:
+        security = self.security_engine.evaluate(context)
+        resources = self.resource_engine.evaluate(context)
+        resolution = self.conflict_resolver.resolve(security, resources)
+        selection = self.selector.select(resolution)
+        
+        return OrchestrationResult(
+            security=security,
+            resources=resources,
+            resolution=resolution,
+            selection=selection,
+            crypto_result=None,
+        )
