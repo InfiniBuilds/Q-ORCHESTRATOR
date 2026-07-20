@@ -45,3 +45,4 @@ dist/
 *.secret
 secret_keys/
 private_keys/
+liboqs/
