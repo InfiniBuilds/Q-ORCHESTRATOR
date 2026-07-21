@@ -14,6 +14,11 @@ from app.crypto.providers.mlkem_provider import MLKEMProvider
 class CryptoExecutionResult:
     profile_id: str
 
+    # Profile Information
+    mlkem_algorithm: str
+    mldsa_algorithm: Optional[str]
+    hybrid_enabled: bool
+
     ciphertext: bytes
     nonce: bytes
     associated_data: bytes
@@ -45,6 +50,7 @@ class CryptoExecutor:
         domain: str,
         session_id: str,
     ) -> CryptoExecutionResult:
+
         salt = os.urandom(32)
         nonce = os.urandom(12)
 
@@ -66,7 +72,6 @@ class CryptoExecutor:
                 session_id=session_id,
                 salt=salt,
             )
-
         else:
             (
                 sender_session_key,
@@ -86,17 +91,14 @@ class CryptoExecutor:
         if profile.per_message_signature:
             if profile.signature_algorithm is None:
                 raise RuntimeError(
-                    "Profile requires signatures but "
-                    "has no signature algorithm"
+                    "Profile requires signatures but has no signature algorithm"
                 )
 
             signature_provider = MLDSAProvider(
                 profile.signature_algorithm
             )
 
-            signing_keys = (
-                signature_provider.generate_keypair()
-            )
+            signing_keys = signature_provider.generate_keypair()
 
             signature_result = signature_provider.sign(
                 secret_key=signing_keys.secret_key,
@@ -133,6 +135,9 @@ class CryptoExecutor:
 
         return CryptoExecutionResult(
             profile_id=profile.profile_id,
+            mlkem_algorithm=profile.mlkem_algorithm,
+            mldsa_algorithm=profile.signature_algorithm,
+            hybrid_enabled=profile.hybrid_key_establishment,
             ciphertext=encryption_result.ciphertext,
             nonce=encryption_result.nonce,
             associated_data=associated_data,
@@ -152,6 +157,7 @@ class CryptoExecutor:
         session_id: str,
         salt: bytes,
     ) -> tuple[bytes, bytes, int]:
+
         hybrid = HybridKeyEstablishment(
             mlkem_algorithm=profile.mlkem_algorithm,
             hkdf_hash=profile.hkdf_hash,
@@ -177,6 +183,7 @@ class CryptoExecutor:
         session_id: str,
         salt: bytes,
     ) -> tuple[bytes, bytes, int]:
+
         mlkem_provider = MLKEMProvider(
             profile.mlkem_algorithm
         )
