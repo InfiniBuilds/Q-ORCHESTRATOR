@@ -10,18 +10,6 @@ Why this project
 
 RSA and elliptic-curve cryptography, which secure today's banking traffic, can be broken by Shor's algorithm on a large quantum computer. Attackers can also record encrypted traffic now and decrypt it later ("harvest now, decrypt later"). This framework shows how a banking system can migrate to post-quantum algorithms without dropping classical security, using a hybrid design.
 
-Architecture
-Client                                              Bank Server
-  │  TCP connect, SERVER_HELLO / CLIENT_HELLO          │
-  │─────────────────────────────────────────────────▶ │
-  │  DAN  →  NPE  →  Security Profile                  │
-  │◀───────────────────────────────────────────────── │
-  │  RSA key exchange  +  Kyber key exchange           │
-  │◀──────────────────────────────────────────────── ▶ │
-  │  HKFE: fuse both secrets → session keys            │
-  │  AES-256-GCM encrypted channel                     │
-  │  HSFE: RSA + Dilithium dual signature on requests  │
-  │  Verify → execute banking operation → signed reply │
 Core modules
 Module	Purpose
 DAN — Dynamic Algorithm Negotiation	Coordinates the handshake so client and server agree on algorithms
